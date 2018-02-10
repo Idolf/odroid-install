@@ -1,7 +1,5 @@
 HOSTNAME=nanopi
 DISK=/dev/mmcblk0
-# DISK=/dev/loop0
-LOOPFILE=/tmp/loopfile
 CRYPTO=1
 
 PACKAGES='

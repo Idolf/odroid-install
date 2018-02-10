@@ -14,14 +14,7 @@ function unmount_all_target() {
 
 unmount_all_target
 
-if [[ $DISK = /dev/loop0 ]]; then
-    losetup -D
-    rm -rf $LOOPFILE
-    dd if=/dev/urandom of=$LOOPFILE bs=1M count=400
-    losetup -fP $LOOPFILE
-fi
-
-dd if=/dev/zero of=$DISK bs=1M count=1
+dd if=/dev/zero of=$DISK bs=1M count=5
 
 (fdisk $DISK || true) <<EOF
 n
@@ -45,8 +38,8 @@ t
 w
 EOF
 
-dd if=/dev/zero of=${DISK}p1 bs=1M count=1
-dd if=/dev/zero of=${DISK}p2 bs=1M count=1
+dd if=/dev/zero of=${DISK}p1 bs=1M count=5
+dd if=/dev/zero of=${DISK}p2 bs=1M count=5
 
 mkfs.ext4 ${DISK}p1
 
@@ -99,12 +92,6 @@ iface eth0 inet static
     gateway 192.168.8.1
 EOF
 
-# cat > /target/etc/network/interfaces.d/wlan0 <<EOF
-# allow-hotplug wlan0
-# iface wlan0 inet dhcp
-# wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
-# EOF
-
 cat > /target/etc/resolv.conf <<EOF
 nameserver 8.8.8.8
 nameserver 8.8.4.4
@@ -123,11 +110,12 @@ if [[ $CRYPTO = 1 ]]; then
 else
     UUID=$(tune2fs -l ${DISK}p2 | awk '/^Filesystem UUID:/ { print $3 }')
 fi
+BOOT_UUID=$(tune2fs -l ${DISK}p1 | awk '/^Filesystem UUID:/ { print $3 }')
 sed -e "s/{{UUID}}/$UUID/" boot.ini > /target/boot/boot.ini
 
 cat > /target/etc/fstab <<EOF
 UUID=$UUID / ext4 discard,noatime,errors=remount-ro 0 1
-${DISK}p1 /boot ext4 discard,noatime 0 2
+UUID=$BOOT_UUID /boot ext4 discard,noatime 0 2
 EOF
 
 cp -r inside.sh linux-image-*.deb /target
