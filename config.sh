@@ -1,4 +1,4 @@
-HOSTNAME=nanopi
+HOSTNAME=odroid
 DISK=/dev/mmcblk0
 CRYPTO=1
 

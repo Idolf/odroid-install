@@ -88,7 +88,7 @@ EOF
 cat > /target/etc/network/interfaces.d/eth0 <<EOF
 allow-hotplug eth0
 iface eth0 inet static
-    address 192.168.8.20/24
+    address 192.168.8.30/24
     gateway 192.168.8.1
 EOF
 
@@ -118,11 +118,14 @@ UUID=$UUID / ext4 discard,noatime,errors=remount-ro 0 1
 UUID=$BOOT_UUID /boot ext4 discard,noatime 0 2
 EOF
 
-cp -r inside.sh linux-image-*.deb /target
+sed -i -e 's/configure_networking/(sleep 3; configure_networking)/g' /target/usr/share/initramfs-tools/scripts/init-premount/dropbear
+echo smsc95xx >> /target/etc/initramfs-tools/modules
+
+cp -r inside.sh /target
 
 mkdir -p /target/home/idolf-ssh
-cat /home/idolf/.ssh/keys/nanopi.pub > /target/home/idolf-ssh/authorized_keys
-cat /home/idolf/.ssh/keys/nanopi-rsa.pub > /target/etc/dropbear-initramfs/authorized_keys
+cat /home/idolf/.ssh/keys/odroid-test.pub > /target/home/idolf-ssh/authorized_keys
+cat /home/idolf/.ssh/keys/odroid-test-rsa.pub > /target/etc/dropbear-initramfs/authorized_keys
 echo CRYPTSETUP=y >> /target/etc/cryptsetup-initramfs/conf-hook
 
 chroot /target /usr/bin/qemu-arm-static /bin/bash /inside.sh
