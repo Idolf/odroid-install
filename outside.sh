@@ -124,8 +124,8 @@ echo smsc95xx >> /target/etc/initramfs-tools/modules
 cp -r inside.sh /target
 
 mkdir -p /target/home/idolf-ssh
-cat /home/idolf/.ssh/keys/odroid-test.pub > /target/home/idolf-ssh/authorized_keys
-cat /home/idolf/.ssh/keys/odroid-test-rsa.pub > /target/etc/dropbear-initramfs/authorized_keys
+cat /home/idolf/.ssh/keys/odroid.pub > /target/home/idolf-ssh/authorized_keys
+cat /home/idolf/.ssh/keys/odroid-rsa.pub > /target/etc/dropbear-initramfs/authorized_keys
 echo CRYPTSETUP=y >> /target/etc/cryptsetup-initramfs/conf-hook
 
 chroot /target /usr/bin/qemu-arm-static /bin/bash /inside.sh
